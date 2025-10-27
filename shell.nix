@@ -76,6 +76,7 @@ in pkgs.mkShell {
   ];
 
   shellHook = ''
+    export ESP_IDF_BOARD="${board}"
     export REACTOR_UC_PATH=../reactor-uc-idf
     export IDF_PATH=${esp-idf}
     
