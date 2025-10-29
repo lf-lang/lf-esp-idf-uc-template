@@ -11,7 +11,7 @@ set(EXTRA_COMPONENT_DIRS idf-extra-components/led_strip)
 idf_build_component(idf-extra-components/led_strip)
 
 if (NOT DEFINED LF_MAIN)
-  set(LF_MAIN "Hello")
+  set(LF_MAIN "HelloEsp")
 endif()
 
 if (NOT DEFINED LOG_LEVEL)
