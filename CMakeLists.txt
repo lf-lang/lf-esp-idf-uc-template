@@ -9,8 +9,12 @@ set(PLATFORM
 set(IDF_COMPONENTS "freertos" "esptool_py" "driver" "led_strip")
 # Set the path for the extra led_strip component Additional components can be
 # added here
-set(EXTRA_COMPONENT_DIRS idf-extra-components/led_strip)
-idf_build_component(idf-extra-components/led_strip)
+if(NOT DEFINED IDF_EXTRA_COMPONENTS_PATH)
+  set(IDF_EXTRA_COMPONENTS_PATH
+      "${CMAKE_CURRENT_LIST_DIR}/idf-extra-components")
+endif()
+set(EXTRA_COMPONENT_DIRS ${IDF_EXTRA_COMPONENTS_PATH}/led_strip)
+idf_build_component(${IDF_EXTRA_COMPONENTS_PATH}/led_strip)
 
 if(NOT DEFINED LF_MAIN)
   set(LF_MAIN "HelloEsp")
