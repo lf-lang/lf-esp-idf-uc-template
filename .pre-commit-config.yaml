@@ -41,6 +41,7 @@ repos:
       - id: cmake-format
         args: [--in-place]
       - id: cmake-lint
+        # Disable warning for ESP-IDF "elf_file" 
         args: [--disabled-codes=C0103]
 
   # Markdown linting

@@ -9,16 +9,16 @@
   outputs = { self, nixpkgs, flake-utils }:
     flake-utils.lib.eachDefaultSystem
       (system:
-        let 
+        let
           pkgs = nixpkgs.legacyPackages.${system};
-          
+
           # Function to create a dev shell for a specific board
           mkDevShell = board: import ./shell.nix { inherit pkgs board; };
         in
         {
           # Default shell with esp32
           devShells.default = mkDevShell "esp32";
-          
+
           # Specific shells for different boards
           devShells.esp32 = mkDevShell "esp32";
           devShells.esp32s2 = mkDevShell "esp32s2";
