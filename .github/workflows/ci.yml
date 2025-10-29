@@ -1,0 +1,28 @@
+name: "CI"
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+
+jobs:
+  ci:
+    name: Build and test template
+    runs-on: ubuntu-24.04
+    env:
+      REACTOR_UC_PATH: ${{ github.workspace }}/reactor-uc
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Checkout reactor-uc
+        uses: ./.github/actions/reactor-uc
+          
+      - name: Install LFC dependencies
+        uses: ./reactor-uc/.github/actions/lingua-franca
+
+      - name: Install ESP-IDF dependencies
+        uses: ./.github/actions/espidf
+
+      - name: Run tests
+        run: ./.github/scripts/run-all.sh
