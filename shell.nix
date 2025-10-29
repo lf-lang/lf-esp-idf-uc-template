@@ -1,61 +1,8 @@
 { pkgs ? import <nixpkgs> {}
-, board ? "esp32c6"  # Default board, can be: esp32c6, esp32c3, esp32, all, etc.
+, board ? "esp32"  # Default board, can be: esp32c6, esp32c3, esp32, all, etc.
 }:
 
-let
-  esp-idf = pkgs.stdenv.mkDerivation {
-    name = "esp-idf-5.5.1-${board}";
-    src = ./esp-idf;
-    
-    nativeBuildInputs = with pkgs; [
-      python3
-      python3Packages.pip
-      python3Packages.virtualenv
-      git
-      wget
-      flex
-      bison
-      gperf
-      cmake
-      ninja
-    ];
-
-    buildInputs = with pkgs; [
-      libffi
-      openssl
-      libusb1
-    ];
-
-    configurePhase = ''
-      export HOME=$TMPDIR
-      # Run the ESP-IDF install script for the specified board
-      echo "Installing ESP-IDF for board: ${board}"
-      ./install.sh ${board}
-    '';
-
-    buildPhase = "true";  # No build phase needed
-
-    installPhase = ''
-      mkdir -p $out
-      cp -r . $out/
-      
-      # Create a wrapper script that sets up the environment
-      mkdir -p $out/bin
-      cat > $out/bin/idf-env <<EOF
-      #!/bin/sh
-      export IDF_PATH=$out
-      source $out/export.sh
-      EOF
-      chmod +x $out/bin/idf-env
-    '';
-
-    meta = {
-      description = "ESP-IDF framework for ${board}";
-      platforms = pkgs.lib.platforms.linux;
-    };
-  };
-
-in pkgs.mkShell {
+pkgs.mkShell {
   buildInputs = with pkgs; [
     git
     wget
@@ -72,18 +19,34 @@ in pkgs.mkShell {
     openssl
     dfu-util
     libusb1
-    esp-idf
   ];
 
   shellHook = ''
     export ESP_IDF_BOARD="${board}"
     export REACTOR_UC_PATH=../reactor-uc-idf
-    export IDF_PATH=${esp-idf}
+    export IDF_PATH=./esp-idf
+    
+    # Check if ESP-IDF tools are installed for this board
+    if [ ! -f "$HOME/.espressif/.${board}_installed" ]; then
+      echo "Installing ESP-IDF tools for ${board}..."
+      (
+        cd esp-idf
+        ./install.sh ${board}
+        touch "$HOME/.espressif/.${board}_installed"
+      )
+      echo "ESP-IDF tools installed successfully!"
+    else
+      echo "ESP-IDF tools for ${board} already installed."
+    fi
     
     # Source the ESP-IDF export script to set up the environment
-    source ${esp-idf}/export.sh
+    if [ -f "./esp-idf/export.sh" ]; then
+      source ./esp-idf/export.sh
+    fi
     
+    echo ""
     echo "ESP-IDF development environment loaded"
+    echo "Board: ${board}"
     echo "IDF_PATH: $IDF_PATH"
     echo "Python version: $(python3 --version)"
   '';
