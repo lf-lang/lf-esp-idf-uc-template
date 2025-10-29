@@ -1,0 +1,98 @@
+target uC
+
+preamble{=
+  #include "led_strip.h"
+  #include "driver/gpio.h"
+
+  #define BLINK_GPIO 8
+  #define CONFIG_BLINK_LED_STRIP 1
+  #define CONFIG_BLINK_LED_STRIP_BACKEND_SPI 1
+
+#ifdef CONFIG_BLINK_LED_STRIP
+
+static led_strip_handle_t led_strip;
+
+static void set_led_value(bool led_on)
+{
+  /* If the addressable LED is enabled */
+  if (led_on) {
+    /* Set the LED pixel using RGB from 0 (0%) to 255 (100%) for each color */
+    led_strip_set_pixel(led_strip, 0, 16, 16, 16);
+    /* Refresh the strip to send data */
+    led_strip_refresh(led_strip);
+  } else {
+    /* Set all LED off to clear all pixels */
+    led_strip_clear(led_strip);
+  }
+}
+
+static void configure_led(void)
+{
+  printf("Example configured to blink addressable LED!\n");
+  /* LED strip initialization with the GPIO and pixels number*/
+  led_strip_config_t strip_config = {
+    .strip_gpio_num = BLINK_GPIO,
+    .max_leds = 1, // at least one LED on board
+  };
+#if CONFIG_BLINK_LED_STRIP_BACKEND_RMT
+  led_strip_rmt_config_t rmt_config = {
+    .resolution_hz = 10 * 1000 * 1000, // 10MHz
+    .flags.with_dma = false,
+  };
+  ESP_ERROR_CHECK(led_strip_new_rmt_device(&strip_config, &rmt_config, &led_strip));
+#elif CONFIG_BLINK_LED_STRIP_BACKEND_SPI
+  led_strip_spi_config_t spi_config = {
+    .spi_bus = SPI2_HOST,
+    .flags.with_dma = true,
+  };
+  ESP_ERROR_CHECK(led_strip_new_spi_device(&strip_config, &spi_config, &led_strip));
+#else
+#error "unsupported LED strip backend"
+#endif
+  /* Set all LED off to clear all pixels */
+  led_strip_clear(led_strip);
+}
+
+#elif CONFIG_BLINK_LED_GPIO
+
+static void set_led_value(bool led_on)
+{
+  /* Set the GPIO level according to the state (LOW or HIGH)*/
+  gpio_set_level(BLINK_GPIO, led_on);
+}
+
+static void configure_led(void)
+{
+  ESP_LOGI(TAG, "Example configured to blink GPIO LED!");
+  gpio_reset_pin(BLINK_GPIO);
+  /* Set the GPIO as a push/pull output */
+  gpio_set_direction(BLINK_GPIO, GPIO_MODE_OUTPUT);
+}
+
+#else
+#error "unsupported LED type"
+#endif
+=}
+
+/**
+ * Led reactor that keeps track of led state. Can either be toggled or set using different signals
+ */
+reactor Led {
+  input tog: bool  // when is_present, will toggle the led
+  input set: bool  // when is_present, set the led state to the input value
+  state led: uint8_t = 0
+
+  reaction(startup) {=
+    configure_led();
+  =}
+
+  reaction(tog) {=
+    self->led = !self->led;
+    set_led_value(self->led);
+  =}
+
+  reaction(set) {=
+    self->led = set->value;
+    set_led_value(self->led);
+  =}
+}

@@ -1,0 +1,19 @@
+target uC {
+  timeout: 10 sec,
+  platform: espidf
+}
+
+import Led from "./lib/Led.lf"
+
+preamble {=
+  #include "reactor-uc/reactor-uc.h"
+=}
+
+main reactor {
+  timer t1(0, 100 msec)
+  led = new Led()
+
+  reaction(t1) -> led.tog {=
+    lf_set(led.tog, true);
+  =}
+}

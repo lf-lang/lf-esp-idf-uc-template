@@ -1,0 +1,18 @@
+target uC {
+  timeout: 10 sec,
+  platform: espidf
+}
+
+preamble {=
+  #include "reactor-uc/reactor-uc.h"
+=}
+
+main reactor {
+  timer t1(0, 1 sec)
+
+  reaction(t1) {=
+    interval_t logical_time = env->get_elapsed_logical_time(env);
+    interval_t physical_time = env->get_physical_time(env);
+    printf("Elapsed lt=%lld and pt=%lld with lag=%lld\n", logical_time, physical_time, physical_time - logical_time);
+  =}
+}
