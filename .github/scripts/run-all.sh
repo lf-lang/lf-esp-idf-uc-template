@@ -7,13 +7,13 @@ build_test() {
     echo "========================================="
     echo "Building $program for $board"
     echo "========================================="
-    cmake -Bbuild -DLF_MAIN=$program -DESP_IDF_BOARD=$board -DCMAKE_TOOLCHAIN_FILE=$IDF_PATH/tools/cmake/toolchain-$board.cmake -GNinja
+    cmake -Bbuild -DLF_MAIN=$program -DESP_IDF_BOARD=$board -DCMAKE_TOOLCHAIN_FILE=$ESP_IDF_PATH/tools/cmake/toolchain-$board.cmake -GNinja
     cmake --build build -j $(nproc)
     rm -rf build src-gen
 }
 
 # Activate ESP-IDF env
-. /$ESP_IDF_PATH/export.sh
+. $ESP_IDF_PATH/export.sh
 
 # BOARD to test (from environment variable)
 board=${ESP_IDF_BOARD}
