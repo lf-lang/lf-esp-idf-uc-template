@@ -6,11 +6,10 @@ on:
   pull_request:
 
 jobs:
-  ci:
-    name: Build and test template
+  # Setup job to cache dependencies for faster CI runs
+  setup:
+    name: Setup dependencies
     runs-on: ubuntu-24.04
-    env:
-      REACTOR_UC_PATH: ${{ github.workspace }}/reactor-uc
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -24,5 +23,32 @@ jobs:
       - name: Install ESP-IDF dependencies
         uses: ./.github/actions/espidf
 
-      - name: Run tests
+  ci:
+    name: Test ${{ matrix.board }}
+    needs: setup
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        # List of ESP32 boards to test in CI
+        board: [esp32c6, esp32c5, esp32c61]
+        # Use the following line to test all boards
+        # board: [esp32, esp32s2, esp32c3, esp32s3, esp32c2, esp32c6, esp32h2, esp32p4, esp32c5, esp32c61]
+    env:
+      REACTOR_UC_PATH: ${{ github.workspace }}/reactor-uc
+      ESP_IDF_BOARD: ${{ matrix.board }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Checkout reactor-uc
+        uses: ./.github/actions/reactor-uc
+          
+      - name: Install LFC dependencies
+        uses: ./reactor-uc/.github/actions/lingua-franca
+
+      - name: Install ESP-IDF dependencies
+        uses: ./.github/actions/espidf
+
+      - name: Run tests for board ${{ matrix.board }}
         run: ./.github/scripts/run-all.sh

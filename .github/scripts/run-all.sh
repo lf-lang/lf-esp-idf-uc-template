@@ -1,33 +1,6 @@
 #!/usr/bin/env bash
 set -e
 
-run_with_timeout() {
-    local duration=$1
-    shift
-    local command="$@"
-
-    # Run the command but disable exit on error (because timeout will cause an error)
-    set +e
-    timeout "$duration" $command
-
-    # Get the exit status of the command and then re-enable exit on error (after forcing a true return value)
-    exit_status=$?
-    true
-    set -e
-
-    # Check the exit status of the timeout command
-    if [ $exit_status -eq 124 ]; then
-        echo "Command timed out (success)."
-        return 0
-    elif [ $exit_status -eq 0 ]; then
-        echo "Command completed successfully within $duration."
-        return 0
-    else
-        echo "Command failed."
-        return 1
-    fi
-}
-
 build_test() {
     local program=$1
     local board=$2
@@ -42,8 +15,8 @@ build_test() {
 # Activate ESP-IDF env
 . /$ESP_IDF_PATH/export.sh
 
-# List of ESP32 boards
-BOARDS=("esp32" "esp32s2" "esp32c3" "esp32s3" "esp32c2" "esp32c6" "esp32h2" "esp32p4" "esp32c5" "esp32c61")
+# BOARD to test
+BOARD=${ESP_IDF_BOARD}
 
 # Automatically discover all LF examples in src directory (excluding lib subdirectory)
 EXAMPLES=()
@@ -56,19 +29,15 @@ for lf_file in src/*.lf; do
 done
 
 echo "Found examples: ${EXAMPLES[@]}"
-echo "Testing boards: ${BOARDS[@]}"
 
-# Test each example on each board
-for board in "${BOARDS[@]}"; do
-    export ESP_IDF_BOARD=$board
-    echo ""
-    echo "========================================"
-    echo "Testing board: $board"
-    echo "========================================"
-    
-    # for example in "${EXAMPLES[@]}"; do
-    #     build_test "$example" "$board"
-    # done
+export ESP_IDF_BOARD=$board
+echo ""
+echo "========================================"
+echo "Testing board: $board"
+echo "========================================"
+
+for example in "${EXAMPLES[@]}"; do
+    build_test "$example" "$board"
 done
 
 echo ""
