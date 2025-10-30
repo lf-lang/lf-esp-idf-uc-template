@@ -7,7 +7,12 @@ build_test() {
     echo "========================================="
     echo "Building $program for $board"
     echo "========================================="
-    cmake -Bbuild -DLF_MAIN=$program -DESP_IDF_BOARD=$board -DCMAKE_TOOLCHAIN_FILE=$ESP_IDF_PATH/tools/cmake/toolchain-$board.cmake -GNinja
+    cmake -Bbuild \
+      -DLF_MAIN=$program \
+      -DESP_IDF_BOARD=$board \
+      -DIDF_EXTRA_COMPONENTS_PATH=$IDF_EXTRA_COMPONENTS_PATH \
+      -DCMAKE_TOOLCHAIN_FILE=$ESP_IDF_PATH/tools/cmake/toolchain-$board.cmake \
+      -GNinja
     cmake --build build -j $(nproc)
     rm -rf build src-gen
 }
