@@ -9,6 +9,7 @@ runs:
         SHA=$(git ls-remote https://github.com/lf-lang/reactor-uc.git refs/heads/esp32-lfc | cut -f1)
         echo "sha=$SHA" >> $GITHUB_OUTPUT
         echo "Latest reactor-uc esp32-lfc SHA: $SHA"
+      shell: bash
 
     - name: Cache reactor-uc
       id: cache-reactor-uc
