@@ -15,8 +15,8 @@ build_test() {
 # Activate ESP-IDF env
 . /$ESP_IDF_PATH/export.sh
 
-# BOARD to test
-BOARD=${ESP_IDF_BOARD}
+# BOARD to test (from environment variable)
+board=${ESP_IDF_BOARD}
 
 # Automatically discover all LF examples in src directory (excluding lib subdirectory)
 EXAMPLES=()
@@ -30,7 +30,6 @@ done
 
 echo "Found examples: ${EXAMPLES[@]}"
 
-export ESP_IDF_BOARD=$board
 echo ""
 echo "========================================"
 echo "Testing board: $board"
