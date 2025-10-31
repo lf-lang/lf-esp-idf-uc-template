@@ -27,10 +27,10 @@ runs:
         echo "IDF_EXTRA_COMPONENTS_PATH=${{ inputs.idf-extra-components-path }}" >> $GITHUB_ENV
       shell: bash
 
-    - name: Install packages
+    - name: Install build packages
       run: |
         sudo apt-get update
-        sudo apt-get install -y --no-install-recommends git wget flex bison gperf python3 python3-pip python3-venv cmake ninja-build ccache libffi-dev libssl-dev dfu-util libusb-1.0-0
+        sudo apt-get install -y --no-install-recommends ninja-build ccache
       shell: bash
 
     - name: Cache ESP-IDF
@@ -41,6 +41,12 @@ runs:
           ${{ inputs.esp-idf-path }}
           ${{ inputs.idf-tools-path }}
         key: esp-idf-${{ inputs.esp-idf-version }}
+
+    - name: Install ESP-IDF dependencies
+      if: steps.cache-esp-idf.outputs.cache-hit != 'true'
+      run: |
+        sudo apt-get install -y --no-install-recommends gperf libffi-dev libssl-dev dfu-util libusb-1.0-0
+      shell: bash
 
     - name: Install Checkout ESP-IDF v5.5.1
       if: steps.cache-esp-idf.outputs.cache-hit != 'true'
