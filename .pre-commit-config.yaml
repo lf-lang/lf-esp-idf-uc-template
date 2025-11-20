@@ -74,7 +74,10 @@ repos:
 # Global file exclusions
 exclude: |
   (?x)^(
-    FreeRTOS/.*|
+    .clang-tidy$|
+    .clang-format$|
+    esp-idf/.*|
+    idf-extra-components/.*|
     src-gen/.*|
     build/.*|
     \.git/.*|
