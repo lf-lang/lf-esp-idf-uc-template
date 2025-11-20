@@ -13,7 +13,7 @@ build_test() {
       -DIDF_EXTRA_COMPONENTS_PATH=$IDF_EXTRA_COMPONENTS_PATH \
       -DCMAKE_TOOLCHAIN_FILE=$ESP_IDF_PATH/tools/cmake/toolchain-$board.cmake \
       -GNinja
-    cmake --build build -j $(nproc)
+    cmake --build build -j "$(nproc)"
     rm -rf build src-gen
 }
 
@@ -33,7 +33,7 @@ for lf_file in src/*.lf; do
     fi
 done
 
-echo "Found examples: ${EXAMPLES[@]}"
+echo "Found examples: " "${EXAMPLES[@]}"
 
 echo ""
 echo "========================================"
@@ -48,4 +48,3 @@ echo ""
 echo "========================================"
 echo "All tests completed successfully!"
 echo "========================================"
-

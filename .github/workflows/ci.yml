@@ -1,8 +1,8 @@
-name: "CI"
+name: CI
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   pull_request:
 
 jobs:
@@ -11,17 +11,17 @@ jobs:
     name: Setup dependencies
     runs-on: ubuntu-24.04
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+    - name: Checkout
+      uses: actions/checkout@v4
 
-      - name: Checkout reactor-uc
-        uses: ./.github/actions/reactor-uc
-          
-      - name: Install LFC dependencies
-        uses: ./reactor-uc/.github/actions/lingua-franca
+    - name: Checkout reactor-uc
+      uses: ./.github/actions/reactor-uc
 
-      - name: Install ESP-IDF dependencies
-        uses: ./.github/actions/espidf
+    - name: Install LFC dependencies
+      uses: ./reactor-uc/.github/actions/lingua-franca
+
+    - name: Install ESP-IDF dependencies
+      uses: ./.github/actions/espidf
 
   ci:
     name: Test ${{ matrix.board }}
@@ -38,17 +38,17 @@ jobs:
       REACTOR_UC_PATH: ${{ github.workspace }}/reactor-uc
       ESP_IDF_BOARD: ${{ matrix.board }}
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+    - name: Checkout
+      uses: actions/checkout@v4
 
-      - name: Checkout reactor-uc
-        uses: ./.github/actions/reactor-uc
-          
-      - name: Install LFC dependencies
-        uses: ./reactor-uc/.github/actions/lingua-franca
+    - name: Checkout reactor-uc
+      uses: ./.github/actions/reactor-uc
 
-      - name: Install ESP-IDF dependencies
-        uses: ./.github/actions/espidf
+    - name: Install LFC dependencies
+      uses: ./reactor-uc/.github/actions/lingua-franca
 
-      - name: Run tests for board ${{ matrix.board }}
-        run: ./.github/scripts/run-all.sh
+    - name: Install ESP-IDF dependencies
+      uses: ./.github/actions/espidf
+
+    - name: Run tests for board ${{ matrix.board }}
+      run: ./.github/scripts/run-all.sh

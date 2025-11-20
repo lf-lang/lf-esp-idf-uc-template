@@ -7,7 +7,7 @@
   - [Reactor-uc](https://github.com/lf-lang/reactor-uc)
   - [Lingua Franca](https://github.com/lf-lang/lingua-franca)
 
-______
+______________________________________________________________________
 
 This is a project template for developing applications targeting ESP32-based
 microcontrollers using the micro-C target of Lingua Franca with the ESP-IDF
