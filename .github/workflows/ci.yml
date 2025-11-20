@@ -6,6 +6,19 @@ on:
   pull_request:
 
 jobs:
+  pre-commit:
+    name: Pre-commit checks
+    runs-on: ubuntu-24.04
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v3
+
+    - name: Run pre-commit hooks
+      uses: pre-commit/action@v3.0.1
+
   # Setup job to cache dependencies for faster CI runs
   setup:
     name: Setup dependencies
@@ -25,7 +38,7 @@ jobs:
 
   ci:
     name: Test ${{ matrix.board }}
-    needs: setup
+    needs: [setup, pre-commit]
     runs-on: ubuntu-24.04
     strategy:
       fail-fast: false
