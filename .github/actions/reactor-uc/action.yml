@@ -1,0 +1,28 @@
+name: Checkout reactor-uc
+description: Checkout the latest reactor-uc version
+runs:
+  using: composite
+  steps:
+  - name: Get reactor-uc branch SHA
+    id: reactor-uc-sha
+    run: |
+      SHA=$(git ls-remote https://github.com/lf-lang/reactor-uc.git refs/heads/esp32-lfc | cut -f1)
+      echo "sha=$SHA" >> $GITHUB_OUTPUT
+      echo "Latest reactor-uc esp32-lfc SHA: $SHA"
+    shell: bash
+
+  - name: Cache reactor-uc
+    id: cache-reactor-uc
+    uses: actions/cache@v4
+    with:
+      path: reactor-uc
+      key: reactor-uc-${{ steps.reactor-uc-sha.outputs.sha }}
+
+  - name: Checkout reactor-uc
+    if: steps.cache-reactor-uc.outputs.cache-hit != 'true'
+    uses: actions/checkout@v4
+    with:
+      repository: lf-lang/reactor-uc
+      path: reactor-uc
+      submodules: recursive
+      ref: esp32-lfc

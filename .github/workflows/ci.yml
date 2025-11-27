@@ -1,0 +1,67 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  pre-commit:
+    name: Pre-commit checks
+    runs-on: ubuntu-24.04
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v3
+
+    - name: Run pre-commit hooks
+      uses: pre-commit/action@v3.0.1
+
+  # Setup job to cache dependencies for faster CI runs
+  setup:
+    name: Setup dependencies
+    runs-on: ubuntu-24.04
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Checkout reactor-uc
+      uses: ./.github/actions/reactor-uc
+
+    - name: Install LFC dependencies
+      uses: ./reactor-uc/.github/actions/lingua-franca
+
+    - name: Install ESP-IDF dependencies
+      uses: ./.github/actions/espidf
+
+  ci:
+    name: Test ${{ matrix.board }}
+    needs: [setup, pre-commit]
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        # List of ESP32 boards to test in CI
+        board: [esp32c6, esp32c5, esp32c61]
+        # Use the following line to test all boards
+        # board: [esp32, esp32s2, esp32c3, esp32s3, esp32c2, esp32c6, esp32h2, esp32p4, esp32c5, esp32c61]
+    env:
+      REACTOR_UC_PATH: ${{ github.workspace }}/reactor-uc
+      ESP_IDF_BOARD: ${{ matrix.board }}
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Checkout reactor-uc
+      uses: ./.github/actions/reactor-uc
+
+    - name: Install LFC dependencies
+      uses: ./reactor-uc/.github/actions/lingua-franca
+
+    - name: Install ESP-IDF dependencies
+      uses: ./.github/actions/espidf
+
+    - name: Run tests for board ${{ matrix.board }}
+      run: ./.github/scripts/run-all.sh

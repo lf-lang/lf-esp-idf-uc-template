@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 3.20.0)
-include(${CMAKE_CURRENT_SOURCE_DIR}/esp-idf/tools/cmake/idf.cmake)
+
+include($ENV{IDF_PATH}/tools/cmake/idf.cmake)
 project(reactor-uc-esp-idf)
 set(PLATFORM
     "ESP_IDF"
