@@ -1,6 +1,4 @@
 target uC {
-  timeout: 10 sec,
-  platform: espidf
 }
 
 preamble {=
@@ -9,6 +7,8 @@ preamble {=
   #include "reactor-uc/reactor-uc.h"
 =}
 
+@platform("esp-idf")
+@timeout(10s)
 main reactor {
   timer t1(0, 1 sec)
 
