@@ -1,5 +1,3 @@
-target uC
-
 preamble {=
   #include "reactor-uc/reactor-uc.h"
 =}

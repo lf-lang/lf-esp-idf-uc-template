@@ -39,10 +39,10 @@ set(LF_MAIN_TARGET ${LF_MAIN})
 set(elf_file ${LF_MAIN_TARGET}.elf)
 add_executable(${LF_MAIN_TARGET})
 
-include($ENV{REACTOR_UC_PATH}/cmake/lfc.cmake)
+include($ENV{REACTOR_UC_PATH}/cmake/ulfc.cmake)
 
 lf_setup()
-lf_run_lfc(OUTPUT_DIR ${CMAKE_CURRENT_SOURCE_DIR}/ FILES src/${LF_MAIN}.lf)
+lf_run_lfc(OUTPUT_DIR ${CMAKE_CURRENT_SOURCE_DIR}/ FILES src/${LF_MAIN}.ulf)
 lf_build_generated_code(${LF_MAIN_TARGET}
                         ${CMAKE_CURRENT_SOURCE_DIR}/src-gen/${LF_MAIN})
 
